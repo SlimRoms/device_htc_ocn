@@ -49,7 +49,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     vendor.audio.use.sw.alac.decoder=true \
     vendor.audio.use.sw.ape.decoder=true \
     vendor.fm.a2dp.conc.disabled=true \
-    vendor.voice.path.for.pcm.voip=true
+    vendor.voice.path.for.pcm.voip=true \
+    ro.af.client_heap_size_kbyte=7168
 
 # Bluetooth
 PRODUCT_PROPERTY_OVERRIDES += \
