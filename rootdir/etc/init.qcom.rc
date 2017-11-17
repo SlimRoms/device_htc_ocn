@@ -38,10 +38,8 @@ on init
     # Set permissions for persist partition
     mkdir /persist 0771 root system
 
-    # Support legacy paths
-    symlink /sdcard /mnt/sdcard
+    # Support legacy path
     symlink /sdcard /storage/sdcard0
-    symlink /storage/ext_sd /sdcard2
 
     # Create cgroup mount point for memory
     mkdir /sys/fs/cgroup/memory/bg 0750 root system
@@ -83,10 +81,9 @@ on post-fs
 
     chmod 0664 /sys/devices/virtual/graphics/fb0/idle_time
     chown system graphics /sys/devices/virtual/graphics/fb0/idle_time
-    write /sys/devices/virtual/graphics/fb0/idle_time 50
+    write /sys/devices/virtual/graphics/fb0/idle_time 100
 
     chmod 0755 /sys/kernel/debug/tracing
-    setprop sys.usb.ffs.aio_compat 1
     ## ensure correct calibration file permissions
     chown root system /persist/sensorcal.json
     chmod 0660 /persist/sensorcal.json
@@ -619,13 +616,14 @@ on post-fs-data
 
     # Create the directories used by the Wireless subsystem
     mkdir /data/vendor/wifi 0770 wifi wifi
-    mkdir /data/vendor/wifi/sockets 0770 wifi wifi
-    mkdir /data/vendor/wifi/hostapd 0770 wifi wifi
-    mkdir /data/vendor/wifi/hostapd/ctrl 0770 wifi wifi
     mkdir /data/vendor/wifi/wpa 0770 wifi wifi
     mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
-    mkdir /data/vendor/wifi/wpa_supplicant 0770 wifi wifi
     mkdir /data/vendor/wifi/wigig_hostapd 0770 wifi wifi
+    mkdir /data/misc/wifi 0770 wifi wifi
+    mkdir /data/misc/wifi/sockets 0770 wifi wifi
+    mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
+    mkdir /data/misc/dhcp 0777 dhcp dhcp
+    chown dhcp dhcp /data/misc/dhcp
     # HTC_WIFI_START
     # Create the directory to save host/fw/pkt log
     mkdir /data/wifi_log 0777 wifi wifi
@@ -919,13 +917,6 @@ service vendor.rmt_storage /vendor/bin/rmt_storage
     shutdown critical
     ioprio rt 0
 
-service ppd /vendor/bin/mm-pp-dpps
-    class hal
-    user system
-    group system graphics
-    socket pps stream 0660 system system
-    writepid /dev/cpuset/system-background/tasks
-
 service vendor.tftp_server /vendor/bin/tftp_server
    class core
    user root
@@ -1066,12 +1057,8 @@ service vendor.amp_unload /system/vendor/bin/amploader -u
     oneshot
 
 service wpa_supplicant /vendor/bin/hw/wpa_supplicant \
-    -puse_p2p_group_interface=1 \
+    -O/data/vendor/wifi/wpa/sockets -puse_p2p_group_interface=1 \
     -g@android:wpa_wlan0
-#   we will start as root and wpa_supplicant will switch to user wifi
-#   after setting up the capabilities required for WEXT
-#   user wifi
-#   group wifi inet keystore
     interface android.hardware.wifi.supplicant@1.0::ISupplicant default
     interface android.hardware.wifi.supplicant@1.1::ISupplicant default
     class main
@@ -1283,14 +1270,6 @@ service vendor.msm_irqbalance /vendor/bin/msm_irqbalance -f /system/vendor/etc/m
     class core
     user root
     group root
-<<<<<<< HEAD:rootdir/init.qcom.rc
-    disabled
-
-service vendor.msm_irqbl_sdm630 /vendor/bin/msm_irqbalance -f /system/vendor/etc/msm_irqbalance_sdm630.conf
-    class core
-    user root
-    group root
-    disabled
 
 service vendor.energy-awareness /vendor/bin/energy-awareness
     class main
