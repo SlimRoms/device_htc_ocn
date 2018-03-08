@@ -2,4 +2,5 @@ subdirs = [
     "light",
     "vibrator",
     "wifi_offload",
+    "power",
 ]
