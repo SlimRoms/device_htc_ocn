@@ -63,6 +63,18 @@
                 android:persistent="false"
                 android:dependency="enable_gestures" />
 
+           <Preference
+                android:key="gesture_short_squeeze"
+                android:title="@string/short_squeeze_title"
+                android:persistent="false"
+                android:dependency="enable_gestures" />
+
+           <Preference
+                android:key="gesture_long_squeeze"
+                android:title="@string/long_squeeze_title"
+                android:persistent="false"
+                android:dependency="enable_gestures" />
+
         </PreferenceCategory>
 
 </PreferenceScreen>
