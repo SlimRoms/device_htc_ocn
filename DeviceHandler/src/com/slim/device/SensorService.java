@@ -32,20 +32,22 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.text.SimpleDateFormat;
 import java.util.Iterator;
 
 import slim.utils.FileUtils;
 import slim.action.Action;
 import slim.action.ActionConstants;
 
-import com.slim.device.settings.ScreenOffGesture;
+import com.slim.device.settings.Gesture;
 
 public class SensorService extends Service implements SensorEventListener {
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     public static final String TAG = "SensorService";
     public static final String HTC_GESTURES = "hTC Gesture_Motion";
+    public static final String HTC_EDGESENSOR = "hTC Edge Sensor";
 
     // Gestures
     private static final int DOUBLE_TAP = 15;
@@ -73,18 +75,21 @@ public class SensorService extends Service implements SensorEventListener {
     private ScreenStateReceiver mScreenStateReceiver;
     private SensorManager mSensorManager;
     private Sensor mSensor = null;
-    private SensorEventListener mSensorEventListener;
+    private Sensor mEdgeSensor = null;
+    private SensorEventListener mGestureSensorEventListener;
+    private SensorEventListener mEdgeSensorEventListener = new EdgeSensorEventListener();
+    private long mGestureUpTime = 0;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         mContext = getApplicationContext();
-        mPrefs = getSharedPreferences(ScreenOffGesture.GESTURE_SETTINGS, Activity.MODE_PRIVATE);
+        mPrefs = getSharedPreferences(Gesture.GESTURE_SETTINGS, Activity.MODE_PRIVATE);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        mSensorEventListener = this;
+        mGestureSensorEventListener = this;
 
         Iterator iterator = mSensorManager.getSensorList(-1).iterator();
         while (iterator.hasNext()) {
@@ -94,17 +99,26 @@ public class SensorService extends Service implements SensorEventListener {
                 mSensor = sensor;
                 if (!FileUtils.writeLine(CONTROL_PATH, Integer.toHexString(SENSOR_GESTURE_ALL))) {
                     Log.w(TAG, "Failed to write control path, unable to disable sensor");
-        }
+                }
+            }
+            if (sensor.getName().equals(HTC_EDGESENSOR)) {
+                if (DEBUG) Log.d(TAG, "found Edge sensor");
+                mEdgeSensor = sensor;
             }
         }
         if (mSensor != null) {
-            mSensorManager.registerListener(mSensorEventListener,
+            mSensorManager.registerListener(mGestureSensorEventListener,
                     mSensor, SensorManager.SENSOR_DELAY_FASTEST);
             mScreenStateReceiver = new ScreenStateReceiver();
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(Intent.ACTION_SCREEN_ON);
             intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
             registerReceiver(mScreenStateReceiver, intentFilter);
+        }
+        if (mEdgeSensor != null) {
+            mSensorManager.registerListener(mEdgeSensorEventListener,
+                    mEdgeSensor, SensorManager.SENSOR_DELAY_FASTEST);
+            if (DEBUG) Log.d(TAG, "Registered Edge Sensor Listener");
         }
     }
 
@@ -123,7 +137,8 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     public final void onSensorChanged(SensorEvent sensorEvent) {
-        mSensorManager.unregisterListener(mSensorEventListener);
+        mSensorManager.unregisterListener(mGestureSensorEventListener);
+        mSensorManager.unregisterListener(mEdgeSensorEventListener);
         float gesture = sensorEvent.values[0];
         if (DEBUG) Log.d(TAG, "Sensor type=" + sensorEvent.sensor.getType()
                 + "," + sensorEvent.values[0] + "," + sensorEvent.values[1]);
@@ -134,27 +149,27 @@ public class SensorService extends Service implements SensorEventListener {
         String action = null;
         switch (gesture) {
             case DOUBLE_TAP:
-                action = mPrefs.getString(ScreenOffGesture.PREF_DOUBLE_TAP,
+                action = mPrefs.getString(Gesture.PREF_DOUBLE_TAP,
                         ActionConstants.ACTION_WAKE_DEVICE);
                 break;
             case SWIPE_UP:
-                action = mPrefs.getString(ScreenOffGesture.PREF_SWIPE_UP,
+                action = mPrefs.getString(Gesture.PREF_SWIPE_UP,
                         ActionConstants.ACTION_TORCH);
                 break;
             case SWIPE_DOWN:
-                action = mPrefs.getString(ScreenOffGesture.PREF_SWIPE_DOWN,
+                action = mPrefs.getString(Gesture.PREF_SWIPE_DOWN,
                         ActionConstants.ACTION_MEDIA_PLAY_PAUSE);
                 break;
             case SWIPE_LEFT:
-                action = mPrefs.getString(ScreenOffGesture.PREF_SWIPE_LEFT,
+                action = mPrefs.getString(Gesture.PREF_SWIPE_LEFT,
                         ActionConstants.ACTION_MEDIA_PREVIOUS);
                 break;
             case SWIPE_RIGHT:
-                action = mPrefs.getString(ScreenOffGesture.PREF_SWIPE_RIGHT,
+                action = mPrefs.getString(Gesture.PREF_SWIPE_RIGHT,
                         ActionConstants.ACTION_MEDIA_NEXT);
                 break;
             case CAMERA:
-                action = mPrefs.getString(ScreenOffGesture.PREF_CAMERA,
+                action = mPrefs.getString(Gesture.PREF_CAMERA,
                         ActionConstants.ACTION_CAMERA);
                 break;
         }
@@ -166,8 +181,49 @@ public class SensorService extends Service implements SensorEventListener {
             Action.processAction(mContext, ActionConstants.ACTION_WAKE_DEVICE, false);
         }
         if (DEBUG) Log.d(TAG, action + ",gesture=" + gesture);
-        mSensorManager.registerListener(mSensorEventListener,
+        mSensorManager.registerListener(mGestureSensorEventListener,
                 mSensor, SensorManager.SENSOR_DELAY_FASTEST);
         Action.processAction(mContext, action, false);
+    }
+
+    private class EdgeSensorEventListener implements SensorEventListener {
+        private SimpleDateFormat mDateFormat;
+        private String[] mIntStrings;
+        long tStart = System.currentTimeMillis();
+        long tEnd = 0;
+
+        private EdgeSensorEventListener() {
+            mIntStrings = new String[10];
+            mDateFormat = new SimpleDateFormat("MM-dd HH:mm:ss.SSS");
+        }
+
+        public void onAccuracyChanged(Sensor sensor, int i) {
+        }
+
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            float f = 1.0f;
+            float maxValue = Math.max(sensorEvent.values[8], sensorEvent.values[9]);
+            CharSequence sensorSequence = "";
+            if (DEBUG) {
+                for (int i = 0; i < 10; i++) {
+                    mIntStrings[i] = Integer.toString((int) sensorEvent.values[i]);
+                    sensorSequence = sensorSequence + mIntStrings[i] + " ";
+                }
+                Log.d("EdgeSensorService", "value=" + sensorSequence);
+            }
+            while (maxValue >= 80.0f) {
+                maxValue=Math.max(sensorEvent.values[8], sensorEvent.values[9]);
+                tEnd = System.currentTimeMillis();
+            }
+            long tDelta = tEnd - tStart;
+            if (tDelta < 100) {
+                Log.d("EdgeSensorService", "Disgard Squeeze");
+            } else if (tDelta <=100 && tDelta >=700) {
+                Log.d("EdgeSensorService", "Short Squeeze");
+            } else if (tDelta > 700) {
+                Log.d("EdgeSensorService", "Long Squeeze");
+            }
+            Log.d("EdgeSensorService", "tDelta= " + tDelta);
+        }
     }
 }
