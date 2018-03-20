@@ -44,13 +44,13 @@ import slim.action.ActionConstants;
 import com.slim.device.R;
 import com.slim.device.util.ShortcutPickerHelper;
 
-public class ScreenOffGesture extends PreferenceFragment implements
+public class Gesture extends PreferenceFragment implements
         OnPreferenceChangeListener, OnPreferenceClickListener,
         ShortcutPickerHelper.OnPickListener {
 
     private static final String SLIM_METADATA_NAME = "slim.framework";
 
-    public static final String GESTURE_SETTINGS = "screen_off_gesture_settings";
+    public static final String GESTURE_SETTINGS = "gesture_settings";
 
     public static final String PREF_GESTURE_ENABLE = "enable_gestures";
     public static final String PREF_SWIPE_UP = "gesture_swipe_up";
@@ -59,6 +59,8 @@ public class ScreenOffGesture extends PreferenceFragment implements
     public static final String PREF_SWIPE_RIGHT = "gesture_swipe_right";
     public static final String PREF_DOUBLE_TAP = "gesture_double_tap";
     public static final String PREF_CAMERA = "gesture_camera";
+    public static final String PREF_SHORT_SQUEEZE = "gesture_short_squeeze";
+    public static final String PREF_LONG_SQUEEZE = "gesture_long_squeeze";
 
     private static final int DLG_SHOW_ACTION_DIALOG  = 0;
     private static final int DLG_RESET_TO_DEFAULT    = 1;
@@ -71,6 +73,8 @@ public class ScreenOffGesture extends PreferenceFragment implements
     private Preference mSwipeRight;
     private Preference mDoubleTap;
     private Preference mCamera;
+    private Preference mShortSqueeze;
+    private Preference mLongSqueeze;
     private SwitchPreference mEnableGestures;
 
     private boolean mCheckPreferences;
@@ -105,7 +109,7 @@ public class ScreenOffGesture extends PreferenceFragment implements
         }
 
         // Load the preferences from an XML resource
-        addPreferencesFromResource(R.xml.screen_off_gesture);
+        addPreferencesFromResource(R.xml.gesture);
         prefs = getPreferenceScreen();
 
         mEnableGestures = (SwitchPreference) prefs.findPreference(PREF_GESTURE_ENABLE);
@@ -116,6 +120,8 @@ public class ScreenOffGesture extends PreferenceFragment implements
         mSwipeRight = (Preference) prefs.findPreference(PREF_SWIPE_RIGHT);
         mDoubleTap = (Preference) prefs.findPreference(PREF_DOUBLE_TAP);
         mCamera = (Preference) prefs.findPreference(PREF_CAMERA);
+        mShortSqueeze = (Preference) prefs.findPreference(PREF_SHORT_SQUEEZE);
+        mLongSqueeze = (Preference) prefs.findPreference(PREF_LONG_SQUEEZE);
 
         setupOrUpdatePreference(mSwipeDown, mPrefs
                 .getString(PREF_SWIPE_DOWN, ActionConstants.ACTION_MEDIA_PLAY_PAUSE));
@@ -129,6 +135,10 @@ public class ScreenOffGesture extends PreferenceFragment implements
                 .getString(PREF_DOUBLE_TAP, ActionConstants.ACTION_WAKE_DEVICE));
         setupOrUpdatePreference(mCamera, mPrefs
                 .getString(PREF_CAMERA, ActionConstants.ACTION_CAMERA));
+        setupOrUpdatePreference(mShortSqueeze, mPrefs
+                .getString(PREF_SHORT_SQUEEZE, ActionConstants.ACTION_CAMERA));
+        setupOrUpdatePreference(mLongSqueeze, mPrefs
+                .getString(PREF_LONG_SQUEEZE, ActionConstants.ACTION_SCREENSHOT));
 
         boolean enableGestures =
                 mPrefs.getBoolean(PREF_GESTURE_ENABLE, true);
@@ -189,7 +199,14 @@ public class ScreenOffGesture extends PreferenceFragment implements
         } else if (preference == mCamera) {
             settingsKey = PREF_CAMERA;
             dialogTitle = R.string.camera_title;
+        } else if (preference == mCamera) {
+            settingsKey = PREF_SHORT_SQUEEZE;
+            dialogTitle = R.string.short_squeeze_title;
+        } else if (preference == mCamera) {
+            settingsKey = PREF_LONG_SQUEEZE;
+            dialogTitle = R.string.long_squeeze_title;
         }
+
         if (settingsKey != null) {
             showDialogInner(DLG_SHOW_ACTION_DIALOG, settingsKey, dialogTitle);
             return true;
@@ -220,6 +237,8 @@ public class ScreenOffGesture extends PreferenceFragment implements
         editor.putString(PREF_SWIPE_RIGHT, ActionConstants.ACTION_MEDIA_NEXT);
         editor.putString(PREF_DOUBLE_TAP, ActionConstants.ACTION_WAKE_DEVICE);
         editor.putString(PREF_CAMERA, ActionConstants.ACTION_CAMERA);
+        editor.putString(PREF_SHORT_SQUEEZE, ActionConstants.ACTION_CAMERA);
+        editor.putString(PREF_LONG_SQUEEZE, ActionConstants.ACTION_SCREENSHOT);
         editor.commit();
         reloadSettings();
     }
@@ -291,8 +310,8 @@ public class ScreenOffGesture extends PreferenceFragment implements
             return frag;
         }
 
-        ScreenOffGesture getOwner() {
-            return (ScreenOffGesture) getTargetFragment();
+        Gesture getOwner() {
+            return (Gesture) getTargetFragment();
         }
 
         @Override
