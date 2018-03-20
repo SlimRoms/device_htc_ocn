@@ -32,13 +32,14 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.text.SimpleDateFormat;
 import java.util.Iterator;
 
 import slim.utils.FileUtils;
 import slim.action.Action;
 import slim.action.ActionConstants;
 
-import com.slim.device.settings.ScreenOffGesture;
+import com.slim.device.settings.Gesture;
 
 public class SensorService extends Service implements SensorEventListener {
 
@@ -46,6 +47,7 @@ public class SensorService extends Service implements SensorEventListener {
 
     public static final String TAG = "SensorService";
     public static final String HTC_GESTURES = "hTC Gesture_Motion";
+    public static final String HTC_EDGESENSOR = "hTC Edge Sensor";
 
     // Gestures
     private static final int DOUBLE_TAP = 15;
@@ -54,6 +56,8 @@ public class SensorService extends Service implements SensorEventListener {
     private static final int SWIPE_RIGHT = 4;
     private static final int SWIPE_LEFT = 5;
     private static final int CAMERA = 6;
+    private static final int SHORTSQUEEZE = 100;
+    private static final int LONGSQUEEZE = 101;
 
     private static final String CONTROL_PATH =
             "/sys/class/htc_sensorhub/sensor_hub/gesture_motion";
@@ -68,23 +72,29 @@ public class SensorService extends Service implements SensorEventListener {
     public static final int SENSOR_GESTURE_DOUBLE_TAP = 0x8000;
     public static final int SENSOR_GESTURE_ALL = 0x807C;
 
+    public static final String PREF_SQUEEZE_FORCE = "squeeze_force";
+    private static final int DEFAULT_SQUEEZE_FORCE = 80;
+
     private Context mContext;
     private SharedPreferences mPrefs;
     private ScreenStateReceiver mScreenStateReceiver;
     private SensorManager mSensorManager;
     private Sensor mSensor = null;
-    private SensorEventListener mSensorEventListener;
+    private Sensor mEdgeSensor = null;
+    private SensorEventListener mGestureSensorEventListener;
+    private SensorEventListener mEdgeSensorEventListener = new EdgeSensorEventListener();
+    private long mGestureUpTime = 0;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         mContext = getApplicationContext();
-        mPrefs = getSharedPreferences(ScreenOffGesture.GESTURE_SETTINGS, Activity.MODE_PRIVATE);
+        mPrefs = getSharedPreferences(Gesture.GESTURE_SETTINGS, Activity.MODE_PRIVATE);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        mSensorEventListener = this;
+        mGestureSensorEventListener = this;
 
         Iterator iterator = mSensorManager.getSensorList(-1).iterator();
         while (iterator.hasNext()) {
@@ -94,24 +104,37 @@ public class SensorService extends Service implements SensorEventListener {
                 mSensor = sensor;
                 if (!FileUtils.writeLine(CONTROL_PATH, Integer.toHexString(SENSOR_GESTURE_ALL))) {
                     Log.w(TAG, "Failed to write control path, unable to disable sensor");
-        }
+                }
+            }
+            if (sensor.getName().equals(HTC_EDGESENSOR)) {
+                if (DEBUG) Log.d(TAG, "found Edge sensor");
+                mEdgeSensor = sensor;
             }
         }
         if (mSensor != null) {
-            mSensorManager.registerListener(mSensorEventListener,
+            mSensorManager.registerListener(mGestureSensorEventListener,
                     mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+            if (DEBUG) Log.d(TAG, "Registered Gesture Sensor Listener");
             mScreenStateReceiver = new ScreenStateReceiver();
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(Intent.ACTION_SCREEN_ON);
             intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
             registerReceiver(mScreenStateReceiver, intentFilter);
         }
+        if (mEdgeSensor != null) {
+            if (mPrefs.getBoolean(Gesture.PREF_SQUEEZE_GESTURE_ENABLE, true)) {
+                mSensorManager.registerListener(mEdgeSensorEventListener,
+                        mEdgeSensor, SensorManager.SENSOR_DELAY_FASTEST);
+                if (DEBUG) Log.d(TAG, "Registered Edge Sensor Listener");
+            }
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mSensorManager.unregisterListener(this);
+        mSensorManager.unregisterListener(mGestureSensorEventListener);
+        mSensorManager.unregisterListener(mEdgeSensorEventListener);
         unregisterReceiver(mScreenStateReceiver);
     }
 
@@ -123,7 +146,7 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     public final void onSensorChanged(SensorEvent sensorEvent) {
-        mSensorManager.unregisterListener(mSensorEventListener);
+        mSensorManager.unregisterListener(mGestureSensorEventListener);
         float gesture = sensorEvent.values[0];
         if (DEBUG) Log.d(TAG, "Sensor type=" + sensorEvent.sensor.getType()
                 + "," + sensorEvent.values[0] + "," + sensorEvent.values[1]);
@@ -134,29 +157,38 @@ public class SensorService extends Service implements SensorEventListener {
         String action = null;
         switch (gesture) {
             case DOUBLE_TAP:
-                action = mPrefs.getString(ScreenOffGesture.PREF_DOUBLE_TAP,
+                action = mPrefs.getString(Gesture.PREF_DOUBLE_TAP,
                         ActionConstants.ACTION_WAKE_DEVICE);
                 break;
             case SWIPE_UP:
-                action = mPrefs.getString(ScreenOffGesture.PREF_SWIPE_UP,
+                action = mPrefs.getString(Gesture.PREF_SWIPE_UP,
                         ActionConstants.ACTION_TORCH);
                 break;
             case SWIPE_DOWN:
-                action = mPrefs.getString(ScreenOffGesture.PREF_SWIPE_DOWN,
+                action = mPrefs.getString(Gesture.PREF_SWIPE_DOWN,
                         ActionConstants.ACTION_MEDIA_PLAY_PAUSE);
                 break;
             case SWIPE_LEFT:
-                action = mPrefs.getString(ScreenOffGesture.PREF_SWIPE_LEFT,
+                action = mPrefs.getString(Gesture.PREF_SWIPE_LEFT,
                         ActionConstants.ACTION_MEDIA_PREVIOUS);
                 break;
             case SWIPE_RIGHT:
-                action = mPrefs.getString(ScreenOffGesture.PREF_SWIPE_RIGHT,
+                action = mPrefs.getString(Gesture.PREF_SWIPE_RIGHT,
                         ActionConstants.ACTION_MEDIA_NEXT);
                 break;
             case CAMERA:
-                action = mPrefs.getString(ScreenOffGesture.PREF_CAMERA,
+                action = mPrefs.getString(Gesture.PREF_CAMERA,
                         ActionConstants.ACTION_CAMERA);
                 break;
+            case SHORTSQUEEZE:
+                action = mPrefs.getString(Gesture.PREF_SHORT_SQUEEZE,
+                        ActionConstants.ACTION_CAMERA);
+                break;
+            case LONGSQUEEZE:
+                action = mPrefs.getString(Gesture.PREF_LONG_SQUEEZE,
+                        ActionConstants.ACTION_SCREENSHOT);
+                break;
+
         }
         if (action == null || action != null && action.equals(ActionConstants.ACTION_NULL)) {
             return;
@@ -166,8 +198,45 @@ public class SensorService extends Service implements SensorEventListener {
             Action.processAction(mContext, ActionConstants.ACTION_WAKE_DEVICE, false);
         }
         if (DEBUG) Log.d(TAG, action + ",gesture=" + gesture);
-        mSensorManager.registerListener(mSensorEventListener,
+        mSensorManager.registerListener(mGestureSensorEventListener,
                 mSensor, SensorManager.SENSOR_DELAY_FASTEST);
         Action.processAction(mContext, action, false);
+    }
+
+    private class EdgeSensorEventListener implements SensorEventListener {
+        private String[] mIntStrings;
+        long tStart = System.currentTimeMillis();
+        long tEnd = System.currentTimeMillis();
+        long tDelta =0;
+
+        private EdgeSensorEventListener() {
+            mIntStrings = new String[10];
+        }
+
+        public void onAccuracyChanged(Sensor sensor, int i) {
+        }
+
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            float averageValue = ((sensorEvent.values[8] + sensorEvent.values[9])/2);
+               int force=mPrefs.getInt(PREF_SQUEEZE_FORCE,DEFAULT_SQUEEZE_FORCE);
+               if (DEBUG) {
+                   Log.d(TAG, "sensorEvent.values[8]=" + sensorEvent.values[8]);
+                   Log.d(TAG, "sensorEvent.values[9]=" + sensorEvent.values[9]);
+                   Log.d(TAG, "averageForce=" + averageValue);
+               }
+            if (averageValue >= force) {
+               tEnd = System.currentTimeMillis();
+            } else { 
+               tDelta = tEnd - tStart;
+               if (tDelta >=100 && tDelta <=700) {
+                   startAction(SHORTSQUEEZE);
+               } else if (tDelta > 700) {
+                   startAction(LONGSQUEEZE);
+               }
+               tStart = System.currentTimeMillis();
+               tEnd = System.currentTimeMillis();
+               tDelta = 0;
+            }
+        }
     }
 }
