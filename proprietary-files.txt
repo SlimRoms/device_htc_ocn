@@ -928,6 +928,13 @@ etc/firmware/mc_v2.b07:vendor/firmware/mc_v2.b07
 etc/firmware/mc_v2.mdt:vendor/firmware/mc_v2.mdt
 etc/firmware/cyttsp5_fw.bin
 
+#HTC APP
+#-priv-app/EdgeSensorService/EdgeSensorService.apk
+-priv-app/HTCUsonic/HTCUsonic.apk
+-priv-app/SA_AdapterFWUpdateTool/SA_AdapterFWUpdateTool.apk
+priv-app/SA_AdapterFWUpdateTool/lib/arm/libsavitech_fwupgrade_htc.so
+priv-app/SA_AdapterFWUpdateTool/lib/arm/libsvusb.so
+
 # HVDCP 3.0 charger
 vendor/bin/hvdcp_opti
 
