@@ -100,6 +100,12 @@
                 android:persistent="false"
                 android:dependency="enable_squeeze_gestures" />
 
+        <SwitchPreference
+            android:key="enable_squeeze_gestures_haptic"
+            android:title="@string/enable_squeeze_gestures_haptic"
+            android:persistent="false"
+            android:summary="@string/enable_squeeze_gestures_haptic_summary" />
+
         </PreferenceCategory>
 
 </PreferenceScreen>
