@@ -220,6 +220,8 @@ on property:init.svc.per_mgr=running
 on property:sys.shutdown.requested=*
     stop per_proxy
 
+
+
 on charger
 #   start hvdcp_opti
     setprop sys.usb.configfs 1
@@ -494,6 +496,9 @@ on property:sys.boot_completed=1
 
     # Is IOP even still a thing?
     start iop
+
+on property:sys.post_boot.parsed=1
+    start perfd
 
 on property:sys.srgb=1
    write /sys/devices/virtual/graphics/fb0/srgb 1
