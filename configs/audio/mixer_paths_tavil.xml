@@ -2831,7 +2831,7 @@
     </path>
 
     <path name="handset-mic">
-        <path name="dmic3" />
+        <path name="dmic-endfire" />
     </path>
 
     <path name="handset-mic-db">
