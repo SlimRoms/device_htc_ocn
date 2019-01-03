@@ -915,6 +915,13 @@ service vendor.rmt_storage /vendor/bin/rmt_storage
     shutdown critical
     ioprio rt 0
 
+service ppd /vendor/bin/mm-pp-dpps
+    class hal
+    user system
+    group system graphics
+    socket pps stream 0660 system system
+    writepid /dev/cpuset/system-background/tasks
+
 service vendor.tftp_server /vendor/bin/tftp_server
    class core
    user root
