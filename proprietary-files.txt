@@ -823,6 +823,10 @@ vendor/firmware/nanohub.full.bin
 lib/libhubconnection.so
 lib64/libhubconnection.so
 
+# Graphics - Vulkan
+vendor/lib/hw/vulkan.msm8998.so
+vendor/lib64/hw/vulkan.msm8998.so
+
 # Graphics - from LA.UM.7.6.2.r1-03000-89xx.0
 vendor/lib64/egl/eglSubDriverAndroid.so|3975e60984a4980e9091041d839f8315ecd7179c
 vendor/lib64/egl/libEGL_adreno.so|7fba56cd8c6227a59eeac3459c3c62801404434e
