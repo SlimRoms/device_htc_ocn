@@ -1038,7 +1038,6 @@ vendor/etc/perf/perf-profile4.conf
 vendor/etc/perf/perf-profile5.conf
 vendor/etc/perf/perf-profile6.conf
 vendor/etc/perf/perfboostsconfig.xml|f15d7db710490d95681d6a45d9ab38fb6e1f556c
-vendor/etc/powerhint.xml|c23d3a9d8d2ba3b1bbd09c272d75c7143ba17cd0
 vendor/lib/libfeedbackhandler.so|4a2783a03cf4f9935eb63e4525621d70c7fb0462
 vendor/lib/libperfgluelayer.so|f38d3a317e41718fd574c39edb843f10cc05f8bd
 vendor/lib/libqti-perfd-client.so|4dc73bb0039c9db0fea0bf622370f4e393647c41
@@ -1057,6 +1056,9 @@ vendor/bin/pm-proxy
 vendor/bin/pm-service
 vendor/lib/libperipheral_client.so
 vendor/lib64/libperipheral_client.so
+
+# Power
+vendor/etc/powerhint.xml|c23d3a9d8d2ba3b1bbd09c272d75c7143ba17cd0
 
 # QMI
 vendor/bin/irsc_util
