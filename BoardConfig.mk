@@ -18,6 +18,9 @@ BOARD_VENDOR := htc
 
 DEVICE_PATH := device/htc/ocn
 
+# ANT+
+BOARD_ANT_WIRELESS_DEVICE := "qualcomm-hidl"
+
 # Asserts
 TARGET_OTA_ASSERT_DEVICE := htc_ocn,htc_ocnuhl,htc_ocnwhl,htc_ocndugl,htc_ocndtwl
 
@@ -41,23 +44,6 @@ TARGET_USES_UEFI := true
 # Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := MSM8998
 TARGET_NO_BOOTLOADER := true
-
-# Kernel
-BOARD_KERNEL_BASE := 0x00000000
-BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200,n8 androidboot.console=ttyMSM0 user_debug=31 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 sched_enable_hmp=1 sched_enable_power_aware=1 service_locator.enable=1 swiotlb=2048 androidboot.configfs=true androidboot.usbcontroller=a800000.dwc3 androidboot.hardware=qcom androidkey.dummy=1 androidboot.fpsensor=fpc1145
-#BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
-BOARD_KERNEL_IMAGE_NAME := Image.lz4-dtb
-BOARD_KERNEL_PAGESIZE := 4096
-BOARD_KERNEL_TAGS_OFFSET := 0x00000100
-BOARD_RAMDISK_OFFSET     := 0x01000000
-TARGET_COMPILE_WITH_MSM_KERNEL := true
-TARGET_KERNEL_SOURCE := kernel/htc/msm8998
-TARGET_KERNEL_CONFIG := slim_ocean_defconfig
-
-BOARD_ROOT_EXTRA_FOLDERS := bt_firmware dsp firmware persist
-
-# ANT+
-BOARD_ANT_WIRELESS_DEVICE := "qualcomm-hidl"
 
 # Audio
 AUDIO_FEATURE_ENABLED_3D_AUDIO := true
@@ -114,15 +100,19 @@ USE_LEGACY_AUDIO_DAEMON := false
 USE_LEGACY_AUDIO_MEASUREMENT := false
 USE_XML_AUDIO_POLICY_CONF := 1
 
-BOARD_USES_ALSA_AUDIO := true
-BOARD_ROOT_EXTRA_SYMLINKS := /vendor/lib/dsp:/dsp
-
 # Bluetooth
 BOARD_HAS_QCA_BT_ROME := true
 BOARD_HAVE_BLUETOOTH_QCOM := true
 QCOM_BT_USE_BTNV := true
 QCOM_BT_USE_SMD_TTY := true
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(DEVICE_PATH)/bluetooth/include
+
+BOARD_USES_ALSA_AUDIO := true
+BOARD_ROOT_EXTRA_SYMLINKS := /vendor/lib/dsp:/dsp
+
+# Bootloader
+TARGET_BOOTLOADER_BOARD_NAME := MSM8998
+TARGET_NO_BOOTLOADER := true
 
 # Camera
 TARGET_USES_QTI_CAMERA2CLIENT := true
@@ -132,11 +122,11 @@ USE_DEVICE_SPECIFIC_CAMERA := true
 TARGET_USES_QTI_CAMERA_DEVICE := true
 TARGET_CAMERASERVICE_CLOSES_NATIVE_HANDLES := true
 
-# CNE and DPM
-BOARD_USES_QCNE := true
-
 # Charger
 BOARD_CHARGER_ENABLE_SUSPEND := true
+
+# CNE and DPM
+BOARD_USES_QCNE := true
 
 # Display
 TARGET_FORCE_HWC_FOR_VIRTUAL_DISPLAYS := true
@@ -191,17 +181,29 @@ BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := $(TARGET_BOARD_PLATFORM)
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
 DEVICE_MATRIX_FILE := $(DEVICE_PATH)/compatibility_matrix.xml
 
-# IPA
-USE_DEVICE_SPECIFIC_DATA_IPA_CFG_MGR := true
-
-# Shims
-TARGET_LD_SHIM_LIBS := /vendor/lib/hw/camera.msm8998.so|libcamera_shim.so
-
 # Init
 TARGET_UNIFIED_DEVICE := true
 TARGET_INIT_VENDOR_LIB := libinit_ocn
 TARGET_RECOVERY_DEVICE_MODULES := libinit_ocn
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rootdir/fstab.recovery
+
+# IPA
+USE_DEVICE_SPECIFIC_DATA_IPA_CFG_MGR := true
+
+# Kernel
+BOARD_KERNEL_BASE := 0x00000000
+BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200,n8 androidboot.console=ttyMSM0
+BOARD_KERNEL_CMDLINE += user_debug=31 ehci-hcd.park=3 lpm_levels.sleep_disabled=1
+BOARD_KERNEL_CMDLINE += sched_enable_hmp=1 sched_enable_power_aware=1 service_locator.enable=1
+BOARD_KERNEL_CMDLINE += swiotlb=2048 androidboot.configfs=true androidboot.usbcontroller=a800000.dwc3
+BOARD_KERNEL_CMDLINE += androidboot.hardware=qcom androidkey.dummy=1 androidboot.fpsensor=fpc1145
+BOARD_KERNEL_IMAGE_NAME := Image.lz4-dtb
+BOARD_KERNEL_PAGESIZE := 4096
+BOARD_KERNEL_TAGS_OFFSET := 0x00000100
+BOARD_RAMDISK_OFFSET     := 0x01000000
+TARGET_COMPILE_WITH_MSM_KERNEL := true
+TARGET_KERNEL_SOURCE := kernel/htc/msm8998
+TARGET_KERNEL_CONFIG := slim_ocean_defconfig
 
 # Lights
 TARGET_PROVIDES_LIBLIGHT := true
@@ -214,6 +216,12 @@ TARGET_USES_INTERACTION_BOOST := true
 
 # Properties
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
+
+# Root
+BOARD_ROOT_EXTRA_FOLDERS := bt_firmware dsp firmware persist
+
+# Shims
+TARGET_LD_SHIM_LIBS := /vendor/lib/hw/camera.msm8998.so|libcamera_shim.so
 
 # Qualcomm
 BOARD_USES_QCOM_HARDWARE := true
