@@ -249,6 +249,7 @@ PRODUCT_PACKAGES += \
     init.qcom.usb.rc \
     init.htc.common.rc \
     init.target.rc \
+    init.target.performance.rc \
     ueventd.rc
 
 # Init Scripts
