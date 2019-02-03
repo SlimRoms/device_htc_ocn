@@ -1280,6 +1280,7 @@ service vendor.msm_irqbalance /vendor/bin/msm_irqbalance -f /system/vendor/etc/m
     class core
     user root
     group root
+<<<<<<< HEAD:rootdir/init.qcom.rc
     disabled
 
 service vendor.msm_irqbl_sdm630 /vendor/bin/msm_irqbalance -f /system/vendor/etc/msm_irqbalance_sdm630.conf
@@ -1287,6 +1288,13 @@ service vendor.msm_irqbl_sdm630 /vendor/bin/msm_irqbalance -f /system/vendor/etc
     user root
     group root
     disabled
+
+service vendor.energy-awareness /vendor/bin/energy-awareness
+    class main
+    user root
+    group system
+    oneshot
+    writepid /dev/cpuset/system-background/tasks
 
 # service for USERDEBUG
 service vendor.LKCore-dbg /vendor/bin/LKCore
