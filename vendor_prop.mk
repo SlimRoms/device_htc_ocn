@@ -35,7 +35,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     vendor.audio.dolby.ds2.enabled=false \
     vendor.audio.dolby.ds2.hardbypass=false \
     vendor.audio.flac.sw.decoder.24bit=true \
-    vendor.audio_hal.period_size=192 \
     vendor.audio.hw.aac.encoder=true \
     vendor.audio.noisy.broadcast.delay=600 \
     vendor.audio.offload.buffer.size.kb=1024 \
@@ -48,6 +47,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     vendor.audio.tunnel.encode=false \
     vendor.audio.use.sw.alac.decoder=true \
     vendor.audio.use.sw.ape.decoder=true \
+    vendor.audio_hal.period_size=192 \
     vendor.fm.a2dp.conc.disabled=true \
     vendor.voice.path.for.pcm.voip=true \
     ro.af.client_heap_size_kbyte=7168
@@ -130,21 +130,38 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Perf
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.core_ctl_min_cpu=0 \
-    ro.core_ctl_max_cpu=4 \
     ro.sys.fw.bg_apps_limit=60 \
-    ro.vendor.extension_library=libqti-perfd-client.so
+    ro.vendor.qti.config.zram=true
 
 # Radio
 PRODUCT_PROPERTY_OVERRIDES += \
-    DEVICE_PROVISIONED=1 \
+    persist.radio.ROTATION_ENABLE=1 \
+    persist.radio.RATE_ADAPT_ENABLE=1 \
+    persist.radio.VT_ENABLE=1 \
+    persist.radio.VT_HYBRID_ENABLE=1 \
+    persist.radio.videopause.mode=1 \
     persist.radio.apm_sim_not_pwdn=0 \
-    persist.vendor.dpm.feature=0 \
-    persist.vendor.radio.apm_mdm_not_pwdn=1 \
+    persist.radio.apm_mdm_not_pwdn=1 \
+    persist.radio.fill_eons=1 \
+    persist.rild.nitz_plmn="" \
+    persist.rild.nitz_long_ons_0="" \
+    persist.rild.nitz_long_ons_1="" \
+    persist.rild.nitz_long_ons_2="" \
+    persist.rild.nitz_long_ons_3="" \
+    persist.rild.nitz_short_ons_0="" \
+    persist.rild.nitz_short_ons_1="" \
+    persist.rild.nitz_short_ons_2="" \
+    persist.rild.nitz_short_ons_3="" \
     persist.vendor.radio.cs_srv_type=1 \
+    persist.vendor.radio.snapshot_timer=0 \
+    persist.vendor.radio.data_ltd_sys_ind=1 \
+    persist.vendor.radio.apm_mdm_not_pwdn=1 \
     persist.vendor.radio.data_ltd_sys_ind=1 \
     persist.vendor.radio.fill_eons=1 \
     persist.vendor.radio.snapshot_timer=0 \
+    persist.igps.sensor=on \
+    ril.subscription.types=NV,RUIM \
+    DEVICE_PROVISIONED=1 \
     rild.libpath=/vendor/lib64/libril-qc-qmi-1.so \
     ro.baseband.arch=msm
 
@@ -160,6 +177,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.data.wda.enable=true \
     persist.rmnet.data.enable=true \
     persist.data.iwlan.enable=true 
+    
+# Sense
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.build.sense.version=9.0
 
 # Sensors
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -181,7 +202,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Telephony
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.telephony.call_ring.multiple=false
+    ro.telephony.call_ring.multiple=false \
+    telephony.lteOnCdmaDevice=0
 
 # Time-services
 PRODUCT_PROPERTY_OVERRIDES += \
