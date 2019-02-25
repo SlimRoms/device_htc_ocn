@@ -134,6 +134,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     DEVICE_PROVISIONED=1 \
     persist.radio.apm_sim_not_pwdn=0 \
+    persist.vendor.dpm.feature=0 \
     persist.vendor.radio.apm_mdm_not_pwdn=1 \
     persist.vendor.radio.cs_srv_type=1 \
     persist.vendor.radio.data_ltd_sys_ind=1 \
