@@ -173,7 +173,7 @@ DEVICE_MATRIX_FILE := $(DEVICE_PATH)/compatibility_matrix.xml
 
 # Init
 TARGET_UNIFIED_DEVICE := true
-TARGET_INIT_VENDOR_LIB := libinit_ocn
+TARGET_INIT_VENDOR_LIB := //$(DEVICE_PATH):libinit_ocn
 TARGET_RECOVERY_DEVICE_MODULES := libinit_ocn
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rootdir/etc/fstab.recovery
 
