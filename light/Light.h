@@ -51,7 +51,6 @@ private:
 
     LightState mAttentionState;
     LightState mBatteryState;
-    LightState mCapacitiveState;
     LightState mNotificationState;
 
     std::unordered_map<Type, std::function<void(const LightState&)>> mLights;
