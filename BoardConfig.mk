@@ -21,6 +21,9 @@ DEVICE_PATH := device/htc/ocn
 # ANT+
 BOARD_ANT_WIRELESS_DEVICE := "qualcomm-hidl"
 
+# APEX image
+DEXPREOPT_GENERATE_APEX_IMAGE := true
+
 # Asserts
 TARGET_OTA_ASSERT_DEVICE := htc_ocn,htc_ocnuhl,htc_ocnwhl,htc_ocndugl,htc_ocndtwl
 
