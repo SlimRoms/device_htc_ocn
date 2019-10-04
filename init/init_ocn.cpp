@@ -114,10 +114,6 @@ void vendor_load_properties()
     std::string bootmid;
     std::string bootcid;
 
-    platform = GetProperty("ro.board.platform","");
-    if (platform != ANDROID_TARGET)
-        return;
-
     bootmid = GetProperty("ro.boot.mid","");
     bootcid = GetProperty("ro.boot.cid","");
 
