@@ -177,9 +177,6 @@ TARGET_INIT_VENDOR_LIB := libinit_ocn
 TARGET_RECOVERY_DEVICE_MODULES := libinit_ocn
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rootdir/etc/fstab.recovery
 
-# IPA
-USE_DEVICE_SPECIFIC_DATA_IPA_CFG_MGR := true
-
 # Kernel
 BOARD_KERNEL_CMDLINE += user_debug=31 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 service_locator.enable=1
 BOARD_KERNEL_CMDLINE += swiotlb=2048 androidboot.configfs=true androidboot.usbcontroller=a800000.dwc3
