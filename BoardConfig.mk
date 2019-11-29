@@ -176,7 +176,7 @@ DEVICE_MATRIX_FILE := $(DEVICE_PATH)/compatibility_matrix.xml
 
 # Init
 TARGET_UNIFIED_DEVICE := true
-TARGET_INIT_VENDOR_LIB := //$(DEVICE_PATH):libinit_ocn
+#TARGET_INIT_VENDOR_LIB := //$(DEVICE_PATH):libinit_ocn
 TARGET_RECOVERY_DEVICE_MODULES := libinit_ocn
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rootdir/etc/fstab.recovery
 
@@ -187,6 +187,7 @@ USE_DEVICE_SPECIFIC_DATA_IPA_CFG_MGR := true
 BOARD_KERNEL_CMDLINE += user_debug=31 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 service_locator.enable=1
 BOARD_KERNEL_CMDLINE += swiotlb=2048 androidboot.configfs=true androidboot.usbcontroller=a800000.dwc3
 BOARD_KERNEL_CMDLINE += androidboot.hardware=qcom androidkey.dummy=1 androidboot.fpsensor=fpc1145
+BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_TAGS_OFFSET := 0x00000100
 BOARD_RAMDISK_OFFSET     := 0x01000000

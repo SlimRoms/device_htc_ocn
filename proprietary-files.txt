@@ -1122,8 +1122,8 @@ vendor/firmware/venus.b04
 vendor/firmware/venus.mdt
 
 # VR
-vendor/lib/hw/vr.msm8998.so
-vendor/lib64/hw/vr.msm8998.so
+#vendor/lib/hw/vr.msm8998.so
+#vendor/lib64/hw/vr.msm8998.so
 
 # Wi-Fi Display
 -priv-app/WfdService/WfdService.apk
