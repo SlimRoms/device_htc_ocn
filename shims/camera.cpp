@@ -23,3 +23,6 @@ extern "C" void _ZN7android14SurfaceControl8setLayerEi() { }
 extern "C" void _ZN7android14SurfaceControl7setSizeEjj() { }
 extern "C" void _ZN7android14SurfaceControl11setPositionEff() { }
 extern "C" void _ZN7android21SurfaceComposerClient22closeGlobalTransactionEb() { }
+extern "C" void _ZN7android21SurfaceComposerClient17getBuiltInDisplayEi() {}
+extern "C" void _ZN7android14SurfaceControl5clearEv() {}
+extern "C" void _ZN7android13GraphicBuffer4lockEjPPv() {}
