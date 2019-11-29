@@ -202,7 +202,7 @@ void XtraSystemStatusObserver::notify(const list<IDataItemCore*>& dlist)
                     case NETWORKINFO_DATA_ITEM_ID:
                     {
                         SystemStatusNetworkInfo* networkInfo =
-                                reinterpret_cast<SystemStatusNetworkInfo*>(each);
+                                static_cast<SystemStatusNetworkInfo*>(each);
                         mXtraSysStatObj->updateConnectionStatus(networkInfo->mConnected,
                                 networkInfo->mType);
                     }
@@ -210,14 +210,14 @@ void XtraSystemStatusObserver::notify(const list<IDataItemCore*>& dlist)
 
                     case TAC_DATA_ITEM_ID:
                     {
-                        SystemStatusTac* tac = reinterpret_cast<SystemStatusTac*>(each);
+                        SystemStatusTac* tac = static_cast<SystemStatusTac*>(each);
                         mXtraSysStatObj->updateTac(tac->mValue);
                     }
                     break;
 
                     case MCCMNC_DATA_ITEM_ID:
                     {
-                        SystemStatusMccMnc* mccmnc = reinterpret_cast<SystemStatusMccMnc*>(each);
+                        SystemStatusMccMnc* mccmnc = static_cast<SystemStatusMccMnc*>(each);
                         mXtraSysStatObj->updateMccMnc(mccmnc->mValue);
                     }
                     break;

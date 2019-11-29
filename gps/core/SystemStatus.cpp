@@ -1420,7 +1420,7 @@ bool SystemStatus::setPositionFailure(const SystemStatusPQWS1& nmea)
 ******************************************************************************/
 bool SystemStatus::setNetworkInfo(IDataItemCore* dataitem)
 {
-    SystemStatusNetworkInfo* data = reinterpret_cast<SystemStatusNetworkInfo*>(dataitem);
+    SystemStatusNetworkInfo* data = static_cast<SystemStatusNetworkInfo*>(dataitem);
     SystemStatusNetworkInfo s(data->mType,data->mTypeName,data->mSubTypeName,
                               data->mAvailable,data->mConnected,data->mRoaming);
     s.dump();
