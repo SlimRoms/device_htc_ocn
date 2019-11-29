@@ -26,3 +26,5 @@ extern "C" void _ZN7android21SurfaceComposerClient22closeGlobalTransactionEb() {
 extern "C" void _ZN7android21SurfaceComposerClient17getBuiltInDisplayEi() {}
 extern "C" void _ZN7android14SurfaceControl5clearEv() {}
 extern "C" void _ZN7android13GraphicBuffer4lockEjPPv() {}
+extern "C" void _ZN7android20CameraParameters_EXTC1EPNS_16CameraParametersE() {}
+extern "C" void _ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjijPNS_14SurfaceControlEii() {}
