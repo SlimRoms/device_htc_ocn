@@ -28,6 +28,8 @@
 # the DIAG device node is not world writable/readable.
 #/dev/diag                 0660   system     oem_2901  # comment out by HTC
 
+firmware_directories /etc/firmware/ /odm/firmware/ /vendor/firmware/ /firmware/image/ /secapp/lockbooter/
+
 /dev/genlock              0666   system     system
 /dev/wlan                 0660   wifi       wifi
 /dev/kgsl                 0666   system     system
